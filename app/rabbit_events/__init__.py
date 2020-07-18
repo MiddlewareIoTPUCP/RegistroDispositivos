@@ -1,14 +1,12 @@
-import asyncio
 import aio_pika
+import logging
 
-from .register_new_device import register_new_device
+from app.rabbit_events.device_management import device_management
+from app.config import Settings
 
 
 # Start of
-async def start():
-    connection = await aio_pika.connect_robust("amqp://guest:guest@localhost/")
-    await register_new_device(connection=connection)
-
-
-if __name__ == "__main__":
-    asyncio.run(start())
+async def start(settings: Settings):
+    connection = await aio_pika.connect_robust(settings.amqp_broker_url)
+    logging.info("Connected to RabbitMQ")
+    await device_management(connection=connection)
