@@ -21,3 +21,7 @@ venv/
 
 ### Visual Studio Code ###
 .vscode/
+
+
+### Requirements .txt
+requirements.txt
