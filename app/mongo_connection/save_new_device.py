@@ -1,5 +1,5 @@
 from app.mongo_connection.mongodb import get_database
-from pymongo.errors import WriteError
+from pymongo.errors import WriteError, ServerSelectionTimeoutError
 import logging
 
 
@@ -10,15 +10,22 @@ async def save_new_device(register_json: dict) -> (int, str):
     # Looks in database for device
     keys_for_search = ["deviceID", "ownerToken"]
     search_json = {x: register_json[x] for x in keys_for_search}
-    found = await dbClient.find_one(search_json)
-    if found:
-        return 200, str(found['_id'])
+    try:
+        found = await dbClient.find_one(search_json)
+        if found:
+            return 200, str(found['_id'])
+    except ServerSelectionTimeoutError as e:
+        logging.error("Failed to connect to MongoDB, exiting")
+        return 500, str(e)
 
     # If not found, insert it
     try:
         device_id = await dbClient.insert_one(register_json)
         return 200, str(device_id.inserted_id)
     except WriteError as e:
-        # If error is found, especially validation erros of schema, return it
+        # If error is found, especially validation errors of schema, return 400
         logging.error(e)
         return 400, str(e)
+    except ServerSelectionTimeoutError as e:
+        logging.error("Failed to connect to MongoDB, exiting")
+        return 500, str(e)

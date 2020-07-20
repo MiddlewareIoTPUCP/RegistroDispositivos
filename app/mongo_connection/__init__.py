@@ -5,5 +5,7 @@ import logging
 
 
 async def start(settings: Settings) -> None:
-    db.client = AsyncIOMotorClient(settings.mongodb_url)[settings.mongo_database][settings.mongo_collection]
-    logging.info("Connected to MongoDB and database %s collection %s".format(settings.mongo_database))
+    db.client = AsyncIOMotorClient(settings.mongodb_url,
+                                   serverSelectionTimeoutMS=5000)[settings.mongo_database][settings.mongo_collection]
+    logging.info("Created connection to MongoDB, database {} and collection {}".format(settings.mongo_database,
+                                                                                       settings.mongo_collection))

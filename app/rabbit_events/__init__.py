@@ -8,5 +8,5 @@ from app.config import Settings
 # Start of
 async def start(settings: Settings):
     connection = await aio_pika.connect_robust(settings.amqp_broker_url)
-    logging.info("Connected to RabbitMQ")
+    logging.debug("Connected to RabbitMQ")
     await device_management(connection=connection)
