@@ -9,6 +9,7 @@ from app import mongo_connection
 
 app = FastAPI()
 settings = config.Settings()
+config.configure_logger(settings)
 
 
 # Iniciamos la cola de eventos de RabbitMQ

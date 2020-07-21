@@ -1,6 +1,7 @@
+from loguru import logger
+
 from app.mongo_connection.mongodb import get_database
 from pymongo.errors import WriteError, ServerSelectionTimeoutError
-import logging
 
 
 # Searchs in MongoDB if device exists, by ownerToken and deviceID
@@ -13,9 +14,9 @@ async def save_new_device(register_json: dict) -> (int, str):
     try:
         found = await dbClient.find_one(search_json)
         if found:
-            return 200, str(found['_id'])
+            return 200, str(found["_id"])
     except ServerSelectionTimeoutError as e:
-        logging.error("Failed to connect to MongoDB, exiting")
+        logger.error("Failed to connect to MongoDB, exiting")
         return 500, str(e)
 
     # If not found, insert it
@@ -24,8 +25,7 @@ async def save_new_device(register_json: dict) -> (int, str):
         return 200, str(device_id.inserted_id)
     except WriteError as e:
         # If error is found, especially validation errors of schema, return 400
-        logging.error(e)
         return 400, str(e)
     except ServerSelectionTimeoutError as e:
-        logging.error("Failed to connect to MongoDB, exiting")
+        logger.error("Failed to connect to MongoDB, exiting")
         return 500, str(e)

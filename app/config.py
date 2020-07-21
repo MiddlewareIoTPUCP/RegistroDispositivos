@@ -37,9 +37,15 @@ def configure_logger(settings: Settings) -> None:
     seen = set()
     for name in [
         *logging.root.manager.loggerDict.keys(),
+        "gunicorn.access",
+        "gunicorn.error",
+        "uvicorn.access",
+        "uvicorn.error",
     ]:
         if name not in seen:
             seen.add(name.split(".")[0])
             logging.getLogger(name).handlers = [intercept_handler]
 
+    # Uvicorn special case
+    logging.getLogger("uvicorn").handlers = [logging.NullHandler()]
     logger.configure(handlers=[{"sink": sys.stdout}])

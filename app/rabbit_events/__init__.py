@@ -1,12 +1,13 @@
 import aio_pika
-import logging
+
+from loguru import logger
 
 from app.rabbit_events.device_management import device_management
 from app.config import Settings
 
 
-# Start of
+# Start of AioPika connection
 async def start(settings: Settings):
     connection = await aio_pika.connect_robust(settings.amqp_broker_url)
-    logging.debug("Connected to RabbitMQ")
+    logger.info("Connected to RabbitMQ")
     await device_management(connection=connection)
