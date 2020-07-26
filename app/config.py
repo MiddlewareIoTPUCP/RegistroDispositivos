@@ -1,16 +1,30 @@
 import logging
 import sys
+from functools import lru_cache
 
 from pydantic import BaseSettings
 from loguru import logger
 
 
 class Settings(BaseSettings):
+    # AMQP Settings
     amqp_broker_url: str = "amqp://guest:guest@localhost:5672/"
+    # MongoDB Settings
     mongodb_url: str = "mongodb://root:root@localhost:27017/"
     mongo_database: str = "IoTMiddleware"
     mongo_collection: str = "devices"
+    # Log settings
     log_level: str = "INFO"
+    # Hydra/OAuth2 Settings
+    hydra_url: str = "http://localhost:9000"
+    hydra_algorithms: str = "RS256"
+    # User service URL
+    user_service_url: str = "http://localhost:8080"
+
+
+@lru_cache()
+def get_settings():
+    return Settings()
 
 
 class InterceptHandler(logging.Handler):
@@ -30,7 +44,8 @@ class InterceptHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def configure_logger(settings: Settings) -> None:
+def configure_logger() -> None:
+    settings = get_settings()
     intercept_handler = InterceptHandler()
     logging.root.setLevel(settings.log_level)
 
