@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Extra
+from bson import ObjectId
+from pydantic import BaseModel, Extra, Field
 from typing import List, Optional, Union
 
 
@@ -16,8 +17,7 @@ class VirtualModelAction(BaseModel):
     type: str
 
 
-class NewDeviceOperation(BaseModel):
-    operation: str
+class NewDeviceRegister(BaseModel):
     ownerToken: str
     deviceID: str
     virtualModel: List[Union[VirtualModelReading, VirtualModelAction]]
@@ -27,11 +27,15 @@ class NewDeviceOperation(BaseModel):
         extra = Extra.forbid
 
 
-class NewDeviceRegister(BaseModel):
-    ownerToken: str
-    deviceID: str
-    virtualModel: List[Union[VirtualModelReading, VirtualModelAction]]
-    additionalInfo: Optional[dict]
+class NewDeviceOperation(NewDeviceRegister):
+    operation: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class DeviceVirtualModel(NewDeviceRegister):
+    id: str = Field(alias="_id")
 
     class Config:
         extra = Extra.forbid
