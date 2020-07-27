@@ -9,7 +9,7 @@ from pymongo.errors import ServerSelectionTimeoutError
 from app.config import get_settings
 from app.mongo_connection.mongodb import get_database
 from app.utils.hydra_connection import get_current_user
-from data_types import DeviceVirtualModel
+from app.data_types import DeviceVirtualModel
 from app.web_requests.user_service import get_owner_tokens
 
 router = APIRouter()
