@@ -1,4 +1,4 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7-2020-06-06
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8-slim-2020-06-06
 MAINTAINER Alejandro Macedo
 
 ENV PYTHONDONTWRITEBYTECODE 1
