@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Dict
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -17,11 +17,11 @@ settings = get_settings()
 
 
 # Query a device virtual model
-@router.get("/get_device", tags=["devices"])
+@router.get("/get_device", tags=["devices"], response_model=Union[DeviceVirtualModel, Dict])
 async def get_device(obj_id: str,
                      response: Response,
                      user: str = Security(get_current_user, scopes=["all"])
-                     ) -> Union[DeviceVirtualModel, dict]:
+                     ) -> Union[DeviceVirtualModel, Dict]:
     # Getting user owner tokens
     owner_tokens = await get_owner_tokens(user=user)
     if owner_tokens is None:
@@ -54,10 +54,10 @@ async def get_device(obj_id: str,
 
 
 # Query all devices from user
-@router.get("/get_devices", tags=["devices"])
+@router.get("/get_devices", tags=["devices"], response_model=Union[List[DeviceVirtualModel], Dict])
 async def get_devices(response: Response,
                       user: str = Security(get_current_user, scopes=["all"])
-                      ) -> Union[List[DeviceVirtualModel], dict]:
+                      ) -> Union[List[DeviceVirtualModel], Dict]:
     # Getting user owner tokens
     owner_tokens = await get_owner_tokens(user=user)
     if owner_tokens is None:
@@ -81,8 +81,8 @@ async def get_devices(response: Response,
 
 
 # Verify if device is registered
-@router.get("/is_device_registered", tags=["devices"])
-async def is_device_registered(obj_id: str, owner_token: str, response: Response) -> dict:
+@router.get("/is_device_registered", tags=["devices"], response_model=Union[DeviceVirtualModel, Dict])
+async def is_device_registered(obj_id: str, owner_token: str, response: Response) -> Union[DeviceVirtualModel, Dict]:
     dbClient = await get_database()
     try:
         search_json = {"_id": ObjectId(obj_id)}
@@ -92,7 +92,7 @@ async def is_device_registered(obj_id: str, owner_token: str, response: Response
                 response.status_code = status.HTTP_200_OK
                 # Converting back from ObjectId to str
                 virtualModel["_id"] = str(virtualModel["_id"])
-                return virtualModel
+                return DeviceVirtualModel(**virtualModel)
             else:
                 response.status_code = status.HTTP_401_UNAUTHORIZED
                 return {"msg": "Can't query that device, not authorized"}
