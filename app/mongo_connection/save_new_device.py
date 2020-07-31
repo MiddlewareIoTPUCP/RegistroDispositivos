@@ -9,7 +9,7 @@ from app.web_requests.user_service import check_owner_token
 # and returns its ObjectID if true, else registers new device
 async def save_new_device(register_json: dict) -> (int, str):
     ownerToken = register_json["ownerToken"]
-    exists = check_owner_token(ownerToken)
+    exists = await check_owner_token(ownerToken)
 
     if not exists:
         return 400, "Owner Token doesn't exist"
