@@ -11,7 +11,17 @@ settings = get_settings()
 async def get_owner_tokens(user: str) -> Optional[List]:
     params = QueryParams({"username": user})
     async with AsyncClient() as client:
-        resp = await client.get(settings.user_service_url + "/user/getOwnerTokens", params=params)
+        resp = await client.get(settings.user_service_url+"/user/getOwnerTokens", params=params)
     if resp.status_code == status.HTTP_404_NOT_FOUND:
         return None
     return resp.json()
+
+
+async def check_owner_token(ownerToken: str) -> bool:
+    params = QueryParams({"ownerToken": ownerToken})
+    async with AsyncClient() as client:
+        resp = await client.get(settings.user_service_url+"/user/checkOwnerToken", params=params)
+    if resp.status_code == status.HTTP_200_OK:
+        return True
+    else:
+        return False

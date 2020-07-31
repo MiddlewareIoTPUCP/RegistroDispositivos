@@ -1,12 +1,19 @@
 from loguru import logger
+from pymongo.errors import WriteError, ServerSelectionTimeoutError
 
 from app.mongo_connection.mongodb import get_database
-from pymongo.errors import WriteError, ServerSelectionTimeoutError
+from app.web_requests.user_service import check_owner_token
 
 
 # Searchs in MongoDB if device exists, by ownerToken and deviceID
 # and returns its ObjectID if true, else registers new device
 async def save_new_device(register_json: dict) -> (int, str):
+    ownerToken = register_json["ownerToken"]
+    exists = check_owner_token(ownerToken)
+
+    if not exists:
+        return 400, "Owner Token doesn't exist"
+
     dbClient = await get_database()
     # Looks in database for device
     keys_for_search = ["deviceID", "ownerToken"]
